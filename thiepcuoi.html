@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Cưới Online - Mỹ Châu & Văn Thành</title>
+    <script src="https://tailwindcss.com"></script>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        script: ['"Alex Brush"', 'cursive'],
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Montserrat"', 'sans-serif'],
+                    },
+                    colors: {
+                        creamBg: '#F6EEDB',
+                        creamLight: '#FBF7EE',
+                        burgundy: '#5C161D',
+                        burgundyDark: '#3E0B10',
+                        inkBlack: '#1E1818',
+                        goldAccent: '#C59B5F',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F6EEDB;
+            /* Sử dụng file nền hoa văn kem nen.jpg nếu đặt chung thư mục */
+            background-image: url('nen.jpg');
+            background-repeat: repeat;
+            background-size: 420px auto;
+            color: #1E1818;
+            overflow-x: hidden;
+        }
+        /* Lớp phủ làm dịu nền để chữ đỏ đô và chữ đen luôn sắc nét */
+        .cream-overlay {
+            background: rgba(246, 238, 219, 0.86);
+        }
+
+        /* 1. Hiệu ứng cánh hoa đỏ đô & vàng kim rơi */
+        .petal {
+            position: fixed; top: -10%; z-index: 45; pointer-events: none;
+            animation: fall linear infinite;
+        }
+        .petal-shape {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #8B1E28 0%, #5C161D 100%);
+            border-radius: 150% 0 150% 0;
+            box-shadow: 0 2px 6px rgba(92, 22, 29, 0.25);
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+            12% { opacity: 0.85; }
+            50% { transform: translateY(50vh) rotate(180deg) translateX(30px); }
+            88% { opacity: 0.85; }
+            100% { transform: translateY(110vh) rotate(360deg) translateX(-30px); opacity: 0; }
+        }
+
+        /* 2. Ảnh nền Hero tự động chuyển cảnh & zoom mượt */
+        .hero-slide {
+            position: absolute; inset: 0; opacity: 0;
+            transition: opacity 1.8s ease-in-out, transform 8s ease-out;
+            transform: scale(1);
+        }
+        .hero-slide.active {
+            opacity: 1;
+            transform: scale(1.07);
+        }
+
+        /* 3. Hiệu ứng trượt hiện khi cuộn */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 4. Màn mở phong bì đỏ đô */
+        .curtain-left, .curtain-right {
+            transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .opened .curtain-left { transform: translateX(-100%); }
+        .opened .curtain-right { transform: translateX(100%); }
+        .opened .curtain-center { opacity: 0; pointer-events: none; transition: opacity 0.45s ease; }
+
+        @keyframes spinSlow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .animate-spin-slow { animation: spinSlow 7s linear infinite; }
+
+        @keyframes pulseGold {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(197, 155, 95, 0.65); }
+            50% { transform: scale(1.04); box-shadow: 0 0 0 12px rgba(197, 155, 95, 0); }
+        }
+        .btn-pulse { animation: pulseGold 2.2s infinite; }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-burgundy selection:text-creamLight">
+
+    <!-- MÀN HÌNH MỞ THIỆP PHONG CÁCH ĐỎ ĐÔ SANG TRỌNG -->
+    <div id="welcome-curtain" class="fixed inset-0 z-50 flex items-center justify-center overflow-hidden">
+        <div class="curtain-left absolute inset-y-0 left-0 w-1/2 bg-burgundy border-r border-goldAccent/30 shadow-2xl"></div>
+        <div class="curtain-right absolute inset-y-0 right-0 w-1/2 bg-burgundy border-l border-goldAccent/30 shadow-2xl"></div>
+        
+        <div class="curtain-center relative z-10 text-center px-6 max-w-md text-creamLight">
+            <!-- Monogram C&T giống thiệp mẫu -->
+            <div class="w-24 h-24 mx-auto mb-5 rounded-full border-2 border-goldAccent/80 bg-burgundyDark/80 shadow-xl flex flex-col items-center justify-center">
+                <span class="text-[9px] tracking-[0.25em] uppercase text-goldAccent">Wedding</span>
+                <span class="font-serif text-3xl font-bold tracking-wider text-white">C&amp;T</span>
+            </div>
+            <p class="uppercase tracking-[0.3em] text-xs text-goldAccent font-medium mb-2">Trân Trọng Kính Mời</p>
+            <h2 class="font-script text-5xl md:text-6xl text-white mb-2">Mỹ Châu &amp; Văn Thành</h2>
+            <p class="text-xs tracking-widest text-creamBg/80 mb-8">01 . 01 . 2027</p>
+            <button onclick="openInvitation()"
+                class="btn-pulse bg-creamBg text-burgundy px-9 py-3.5 rounded-full text-sm uppercase tracking-widest font-bold shadow-2xl flex items-center gap-2 mx-auto cursor-pointer hover:bg-white transition">
+                <i data-lucide="mail-open" class="w-4 h-4"></i> Mở Thiệp Mời
+            </button>
+        </div>
+    </div>
+
+    <!-- Cánh hoa rơi -->
+    <div id="petals-container"></div>
+
+    <!-- Nhạc nền (đặt file nhac.mp3 vào cùng thư mục hoặc dùng nhạc online dự phòng) -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="nhac.mp3" type="audio/mpeg">
+        <source src="https://soundhelix.com" type="audio/mpeg">
+    </audio>
+
+    <!-- Nút bật/tắt nhạc góc dưới -->
+    <button id="music-btn" onclick="toggleMusic()" title="Bật/Tắt nhạc nền"
+        class="fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full bg-burgundy text-creamLight shadow-xl flex items-center justify-center hover:scale-110 transition-transform border-2 border-goldAccent">
+        <i data-lucide="music" class="w-5 h-5"></i>
+    </button>
+
+    <!-- 1. HERO SECTION: TRANG BÌA ĐỎ ĐÔ & ẢNH CƯỚI TỰ ĐỘNG CHUYỂN CẢNH -->
+    <header class="relative min-h-screen flex items-center justify-center text-center px-4 overflow-hidden bg-burgundyDark">
+        <div id="hero-slideshow" class="absolute inset-0 z-0">
+            <!-- Ưu tiên load file bia.jpg, anh1.jpg, anh2.jpg trong thư mục; nếu chưa có sẽ hiện ảnh dự phòng -->
+            <img id="hero-img-1" src="bia.jpg" onerror="this.src='https://pexels.com'" class="hero-slide active w-full h-full object-cover brightness-75" alt="Ảnh bìa">
+            <img id="hero-img-2" src="anh1.jpg" onerror="this.src='https://pexels.com'" class="hero-slide w-full h-full object-cover brightness-75" alt="Ảnh 1">
+            <img id="hero-img-3" src="anh2.jpg" onerror="this.src='https://pexels.com'" class="hero-slide w-full h-full object-cover brightness-75" alt="Ảnh 2">
+            <div class="absolute inset-0 bg-gradient-to-b from-burgundyDark/60 via-black/30 to-creamBg"></div>
+        </div>
+
+        <div class="relative z-10 max-w-2xl mx-auto text-white pt-10">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full border border-goldAccent/80 bg-burgundy/70 backdrop-blur-sm flex items-center justify-center">
+                <span class="font-serif text-xl font-bold text-goldAccent">C&amp;T</span>
+            </div>
+            <p class="uppercase tracking-[0.35em] text-xs md:text-sm mb-3 text-goldAccent font-semibold">Wedding Invitation</p>
+            <h1 class="font-script text-6xl md:text-8xl mb-4 drop-shadow-lg text-white">Mỹ Châu &amp; Văn Thành</h1>
+            <div class="flex items-center justify-center gap-4 my-5">
+                <span class="h-[1px] w-14 bg-goldAccent"></span>
+                <p class="font-serif italic text-xl md:text-2xl text-creamLight">Save The Date</p>
+                <span class="h-[1px] w-14 bg-goldAccent"></span>
+            </div>
+            <p class="text-lg md:text-2xl tracking-[0.22em] font-semibold mb-10 text-white">01 . 01 . 2027</p>
+            <a href="#thong-tin-gia-dinh" class="inline-flex flex-col items-center text-creamLight/90 hover:text-white text-xs uppercase tracking-widest gap-2">
+                <span>Vuốt xuống xem thiệp</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 animate-bounce text-goldAccent"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- NỘI DUNG CHÍNH TRÊN NỀN KEM HOA VĂN -->
+    <main class="cream-overlay">
+
+        <!-- 2. THÔNG TIN HAI HỌ & CÔ DÂU CHÚ RỂ (Đúng chuẩn thiệp mẫu) -->
+        <section id="thong-tin-gia-dinh" class="py-20 px-4 max-w-4xl mx-auto text-center reveal">
+            <!-- Monogram C&T -->
+            <div class="w-20 h-20 mx-auto mb-8 rounded-full border-2 border-burgundy flex flex-col items-center justify-center bg-creamLight shadow-sm">
+                <span class="text-[8px] tracking-[0.2em] uppercase text-burgundy font-semibold">Wedding</span>
+                <span class="font-serif text-2xl font-bold text-burgundy">C&amp;T</span>
